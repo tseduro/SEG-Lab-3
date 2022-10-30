@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter adapter;
     MyDBHandler dbHandler;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -59,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 productName.setText("");
                 productPrice.setText("");
 
-//                Toast.makeText(MainActivity.this, "Add product", Toast.LENGTH_SHORT).show();
+               Toast.makeText(MainActivity.this, "Add product", Toast.LENGTH_SHORT).show();
                 viewProducts();
             }
         });
@@ -68,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "Find product", Toast.LENGTH_SHORT).show();
+                viewProducts();
             }
         });
 
@@ -83,17 +83,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void viewProducts() {
+        String searchName = productName.getText().toString();
+        String searchPrice = productPrice.getText().toString();
         productList.clear();
         Cursor cursor = dbHandler.getData();
         if (cursor.getCount() == 0) {
             Toast.makeText(MainActivity.this, "Nothing to show", Toast.LENGTH_SHORT).show();
-        } else {
+        }
+        else if (searchName.equals("") && searchPrice.equals("")) {
+            Toast.makeText(MainActivity.this, "Nothing to show", Toast.LENGTH_SHORT).show();
+        }
+        else {
             while (cursor.moveToNext()) {
+                if (searchName.equals("") || productPrice.getText().toString().equals("")) {
+
+                }
+                else {
+                    if (cursor.getString(1).equals(searchName)&&cursor.getString(2).equals(searchPrice)) {
+                        productList.add(cursor.getString(1) + " (" +cursor.getString(2)+")");
+                    }
+                    else {
+                        Toast.makeText(MainActivity.this, "Nothing to show", Toast.LENGTH_SHORT).show();
+                    }
+                }
                 productList.add(cursor.getString(1) + " (" +cursor.getString(2)+")");
             }
         }
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, productList);
         productListView.setAdapter(adapter);
+    }
+    private void deleteProduct() {
+
     }
 }
