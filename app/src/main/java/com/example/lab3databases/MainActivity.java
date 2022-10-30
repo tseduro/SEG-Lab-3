@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         }
         else if (searchName.equals("") && searchPrice.equals("")) {
             Toast.makeText(MainActivity.this, "Nothing to show", Toast.LENGTH_SHORT).show();
+            viewProducts();
         }
         else {
             while (cursor.moveToNext()) {
