@@ -2,7 +2,9 @@ package com.example.lab3databases;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -27,7 +29,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         productList = new ArrayList<>();
 
         // info layout
@@ -51,15 +52,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String name = productName.getText().toString();
-                double price = Double.parseDouble(productPrice.getText().toString());
-                Product product = new Product(name, price);
-                dbHandler.addProduct(product);
+                if (name.equals("") || productPrice.getText().toString().equals("")) {
 
-                productName.setText("");
-                productPrice.setText("");
+                }
+                else {
+                    double price = Double.parseDouble(productPrice.getText().toString());
+                    Product product = new Product(name, price);
+                    dbHandler.addProduct(product);
+                    viewProducts();
+                    productName.setText("");
+                    productPrice.setText("");
+                }
+
 
                Toast.makeText(MainActivity.this, "Add product", Toast.LENGTH_SHORT).show();
-                viewProducts();
+
             }
         });
 
@@ -67,7 +74,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "Find product", Toast.LENGTH_SHORT).show();
-                viewProducts();
+
+                findProducts();
+                productName.setText("");
+                productPrice.setText("");
+
             }
         });
 
@@ -75,17 +86,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "Delete product", Toast.LENGTH_SHORT).show();
+                deleteProd();
+                productName.setText("");
+                productPrice.setText("");
+                viewProducts();
             }
         });
 
 
         viewProducts();
     }
-
-    private void viewProducts() {
+    private void findProducts() {
+        productList.clear();
         String searchName = productName.getText().toString();
         String searchPrice = productPrice.getText().toString();
-        productList.clear();
         Cursor cursor = dbHandler.getData();
         if (cursor.getCount() == 0) {
             Toast.makeText(MainActivity.this, "Nothing to show", Toast.LENGTH_SHORT).show();
@@ -95,17 +109,48 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             while (cursor.moveToNext()) {
-                if (searchName.equals("") || productPrice.getText().toString().equals("")) {
-
+                if (searchName.equals("") || searchPrice.equals("")) {
+                    if (searchName.equals("")) {
+                        if (cursor.getString(2).equals(searchPrice)) {
+                            productList.add(cursor.getString(1) + " (" +cursor.getString(2)+")");
+                        }
+                        else {
+                            Toast.makeText(MainActivity.this, "Nothing to show", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else {
+                        if (cursor.getString(1).equals(searchName)) {
+                            productList.add(cursor.getString(1) + " (" +cursor.getString(2)+")");
+                        }
+                        else {
+                            Toast.makeText(MainActivity.this, "Nothing to show", Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 }
                 else {
-                    if (cursor.getString(1).equals(searchName)&&cursor.getString(2).equals(searchPrice)) {
+                    if (cursor.getString(1).equals(searchName) && cursor.getString(2).equals(searchPrice)) {
                         productList.add(cursor.getString(1) + " (" +cursor.getString(2)+")");
                     }
                     else {
                         Toast.makeText(MainActivity.this, "Nothing to show", Toast.LENGTH_SHORT).show();
                     }
                 }
+            }
+        }
+
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, productList);
+        productListView.setAdapter(adapter);
+    }
+    private void viewProducts() {
+        productList.clear();
+        String searchName = productName.getText().toString();
+        String searchPrice = productPrice.getText().toString();
+        Cursor cursor = dbHandler.getData();
+        if (cursor.getCount() == 0) {
+            Toast.makeText(MainActivity.this, "Nothing to show", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            while (cursor.moveToNext()) {
                 productList.add(cursor.getString(1) + " (" +cursor.getString(2)+")");
             }
         }
@@ -113,7 +158,13 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, productList);
         productListView.setAdapter(adapter);
     }
-    private void deleteProduct() {
+    private void deleteProd() {
+        if (productName.getText().toString().equals("")) {
+            Toast.makeText(MainActivity.this, "Can't delete nothing", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            dbHandler.deleteProduct(productName.getText().toString());
 
+        }
     }
 }
