@@ -35,6 +35,11 @@ public class MyDBHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
+    public void drop() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME);
+        onCreate(db);
+    }
 
     public Cursor getData() {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -67,5 +72,13 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public long getSize() {
         SQLiteDatabase db = this.getWritableDatabase();
         return DatabaseUtils.queryNumEntries(db, TABLE_NAME);
+    }
+    public void deleteAll() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("drop table "+TABLE_NAME);
+        db.execSQL("CREATE TABLE " + TABLE_NAME +
+                "(" + COLUMN_ID + "INTEGER PRIMARY KEY, " +
+                COLUMN_PRODUCT_NAME + " TEXT, " +
+                COLUMN_PRODUCT_PRICE + " DOUBLE " + ")");
     }
 }
