@@ -3,6 +3,7 @@ package com.example.lab3databases;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -13,6 +14,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     private static final String COLUMN_PRODUCT_PRICE = "price";
     private static final String DATABASE_NAME = "products.db";
     private static final int DATABASE_VERSION = 1;
+
 
     public MyDBHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -61,5 +63,9 @@ public class MyDBHandler extends SQLiteOpenHelper {
             return;
         }
 
+    }
+    public long getSize() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return DatabaseUtils.queryNumEntries(db, TABLE_NAME);
     }
 }
