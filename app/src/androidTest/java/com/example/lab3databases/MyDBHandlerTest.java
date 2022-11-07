@@ -23,4 +23,14 @@ public class MyDBHandlerTest {
         db.addProduct(x);
         assertEquals(1, db.getSize());
     }
+
+    @Test
+    public void test_Delete_item(){
+        MyDBHandler b = new MyDBHandler(InstrumentationRegistry.getInstrumentation().getTargetContext());
+        Product x = new Product("test2", 10);
+        b.addProduct(x);
+        assertEquals(1, b.getSize());
+        b.deleteProduct("test2");
+        assertEquals(0, b.getSize());
+    }
 }
